@@ -28,11 +28,11 @@ echo '[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh' >> ~/.zshrc
 # Remove stale Yarn APT repo (missing GPG key breaks apt-get update).
 sudo rm -f /etc/apt/sources.list.d/yarn.list
 
-# Install PlayWright + Chrome + Chromium (headless shell for pnpm test:e2e).
+# Install PlayWright + Chromium (headless shell for pnpm test:e2e).
 echo "🎭 Installing Playwright core..."
-npx -y playwright@latest install --with-deps chrome chromium || {
+npx -y playwright@latest install --with-deps chromium || {
   echo "⚠️  --with-deps failed, retrying without system deps..."
-  npx -y playwright@latest install chrome chromium
+  npx -y playwright@latest install chromium
 }
 
 # Remove all MCP servers.
@@ -48,9 +48,8 @@ cat > .playwright-mcp.json <<JSON
     "browserName": "chromium",
     "isolated": true,
     "launchOptions": {
-      "channel": "chrome",
-      "headless": false,
-      "args": ["--no-sandbox"]
+      "headless": true,
+      "args": ["--no-sandbox", "--disable-dev-shm-usage"]
     }
   }
 }
