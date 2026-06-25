@@ -1,0 +1,18 @@
+{
+  "name": "scorebook",
+  "version": "0.1.0",
+  "description": "Offline-first digital baseball scorecard that runs in any browser.",
+  "private": true,
+  "scripts": {
+    "start": "python3 -m http.server 8000 --directory src",
+    "serve": "npx --yes serve src"
+  },
+  "keywords": [
+    "baseball",
+    "scorecard",
+    "scorekeeping",
+    "offline",
+    "pwa"
+  ],
+  "license": "UNLICENSED"
+}
