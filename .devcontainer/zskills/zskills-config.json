@@ -1,0 +1,29 @@
+{
+  "$schema": "./zskills-config.schema.json",
+  "project_name": "diamondscore",
+  "timezone": "America/New_York",
+  "execution": {
+    "landing": "cherry-pick",
+    "main_protected": false,
+    "branch_prefix": "feat/"
+  },
+  "testing": {
+    "unit_cmd": "pnpm test:unit",
+    "full_cmd": "pnpm test",
+    "output_file": ".test-results.txt",
+    "file_patterns": ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts"]
+  },
+  "dev_server": {
+    "cmd": "pnpm dev",
+    "port_script": "",
+    "main_repo_path": "/workspaces/score"
+  },
+  "ui": {
+    "file_patterns": "apps/pwa/src/.*\\.(tsx|jsx)",
+    "auth_bypass": ""
+  },
+  "ci": {
+    "auto_fix": true,
+    "max_fix_attempts": 2
+  }
+}
