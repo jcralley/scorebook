@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Bootstrap zskills (skills, hooks, scripts) from the ai-dev-tools feature.
+echo "🔧 Bootstrapping zskills..."
+ai-dev-tools-bootstrap-workspace
+
 # Remove stale MCP entries from prior runs.
 echo "🧹 Removing any old MCP entries..."
 rm -f .mcp.json .playwright-mcp.json
