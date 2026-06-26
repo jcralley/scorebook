@@ -295,6 +295,11 @@ table.stat th.stat-sep,table.stat td.stat-sep{border-left:3px solid var(--ink-so
       <h3 id="batTitle">Batting — Away</h3>
       <table class="stat" id="batStats"></table>
     </div>
+
+    <div class="panel" style="margin-top:1rem">
+      <h3 id="innStatsTitle">Per Inning — Away</h3>
+      <table class="stat" id="innStats"></table>
+    </div>
   </div>
 </div>
 
@@ -500,7 +505,7 @@ function recomputeInning(side,inn){
     // reset derived fields from the batter's own intent
     const R=RESULTS[c.code]||{base:0,k:"out"};
     const hit = (c.hit!=null)?c.hit : R.base;        // how far batter got on own action
-    c.run=false; c.rbi=c.manualRbi||0;
+    c.run=false; c.rbi=c.manualRbi||0; c.outOnBase=false;
     c.base = Math.max(hit, c.endBase||0);            // own action + any unforced placement
     const adv = c.adv||{};                           // explicit per-runner outcomes {fromBase: dest|'out'}
 
@@ -510,7 +515,7 @@ function recomputeInning(side,inn){
       const dest=adv[from];
       if(dest==null) return;                  // no explicit instruction; leave as-is
       bases[from]=null;
-      if(dest==="out"){ /* runner retired, vanishes */ }
+      if(dest==="out"){ r.outOnBase=true; }
       else if(dest>=4){ scoreRunner(r); if(R.k==="hit"||R.base>=1) c.rbi++; }
       else { bases[dest]=r; r.base=Math.max(r.base,dest); }
     };
@@ -676,6 +681,16 @@ function inningErrors(side,inn){
   for(const pi in p){const c=p[pi]&&p[pi][inn];if(c&&c.code==="E")e++;}
   return e;
 }
+function inningWalks(side,inn){
+  let w=0;const p=G.plays[side];
+  for(const pi in p){const c=p[pi]&&p[pi][inn];if(c&&(c.code==="BB"||c.code==="HBP"))w++;}
+  return w;
+}
+function inningLOB(side,inn){
+  let lob=0;const p=G.plays[side];
+  for(const pi in p){const c=p[pi]&&p[pi][inn];if(c&&c.base>=1&&!c.run&&!c.outOnBase)lob++;}
+  return lob;
+}
 function inningOuts(side,inn){
   // Count every out recorded in this half-inning: the batter when retired, plus any
   // runner outs captured in the at-bat's `adv` map (force outs, caught stealing on the
@@ -721,6 +736,7 @@ function render(){
   $("#tabHome").textContent=teamLabel("home")+" — Batting";
   renderGrid();
   renderBatStats();
+  renderInningStats();
   renderLineScore();
   persist();
 }
@@ -858,6 +874,25 @@ function renderBatStats(){
   $("#batStats").innerHTML=html;
 }
 
+function renderInningStats(){
+  const side=view;
+  const rows=[
+    {l:"R",fn:inningRuns},{l:"H",fn:inningHits},{l:"BB",fn:inningWalks},
+    {l:"E",fn:inningErrors},{l:"LOB",fn:inningLOB}
+  ];
+  let html="<thead><tr><th class='nm' style='text-align:left'>Stat</th>";
+  for(let i=1;i<=INNINGS;i++)html+=`<th class="inn">${i}</th>`;
+  html+="<th class='stat-sep'>Tot</th></tr></thead><tbody>";
+  rows.forEach(({l,fn})=>{
+    let tot=0;
+    html+=`<tr><td class="nm">${l}</td>`;
+    for(let i=1;i<=INNINGS;i++){const v=fn(side,i);tot+=v;html+=`<td class="inn">${v||""}</td>`;}
+    html+=`<td class="stat-sep">${tot||""}</td></tr>`;
+  });
+  html+="</tbody>";
+  $("#innStats").innerHTML=html;
+  $("#innStatsTitle").textContent="Per Inning — "+teamLabel(side);
+}
 function renderLineScore(){
   let html="<thead><tr><th class='nm' style='text-align:left'>Team</th>";
   for(let i=1;i<=INNINGS;i++)html+=`<th class="inn">${i}</th>`;
