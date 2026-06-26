@@ -176,6 +176,8 @@ table.stat th,table.stat td{padding:.3rem .4rem;border-bottom:1px solid var(--ru
 table.stat th{background:transparent;font-size:.6rem;letter-spacing:.06em;color:var(--ink-soft);text-transform:uppercase}
 table.stat td.nm{text-align:left;font-weight:600}
 table.stat tr:last-child td{border-bottom:none}
+table.stat th.inn,table.stat td.inn{border-right:1px solid var(--rule)}
+table.stat th.stat-sep,table.stat td.stat-sep{border-left:2px solid var(--line-bold)}
 
 /* ---------- modal / sheet ---------- */
 .scrim{position:fixed;inset:0;background:rgba(15,10,5,.55);display:none;z-index:50;
@@ -271,6 +273,11 @@ table.stat tr:last-child td{border-bottom:none}
       <span class="pill" id="innPill">Inning 1 ▲</span>
     </div>
 
+    <div class="panel" style="margin-bottom:.7rem">
+      <h3>Line Score</h3>
+      <table class="stat" id="lineScore"></table>
+    </div>
+
     <div class="tabs">
       <button class="tab on" data-side="away" id="tabAway">Away — Batting</button>
       <button class="tab" data-side="home" id="tabHome">Home — Batting</button>
@@ -284,15 +291,9 @@ table.stat tr:last-child td{border-bottom:none}
       <b>How to score:</b> tap any at-bat box to record the result. Singles–HR fill the base path; tap bases the runner advanced to. Outs show the out number. Edit a player's # and position inline or via <b>Lineups</b>. Everything saves automatically on this device and works offline.
     </div>
 
-    <div class="stats">
-      <div class="panel">
-        <h3 id="batTitle">Batting — Away</h3>
-        <table class="stat" id="batStats"></table>
-      </div>
-      <div class="panel">
-        <h3>Line Score</h3>
-        <table class="stat" id="lineScore"></table>
-      </div>
+    <div class="panel" style="margin-top:1rem">
+      <h3 id="batTitle">Batting — Away</h3>
+      <table class="stat" id="batStats"></table>
     </div>
   </div>
 </div>
@@ -670,6 +671,11 @@ function inningHits(side,inn){
   for(const pi in p){const c=p[pi]&&p[pi][inn];if(c&&RESULTS[c.code]&&RESULTS[c.code].k==="hit")h++;}
   return h;
 }
+function inningErrors(side,inn){
+  let e=0;const p=G.plays[side];
+  for(const pi in p){const c=p[pi]&&p[pi][inn];if(c&&c.code==="E")e++;}
+  return e;
+}
 function inningOuts(side,inn){
   // Count every out recorded in this half-inning: the batter when retired, plus any
   // runner outs captured in the at-bat's `adv` map (force outs, caught stealing on the
@@ -854,13 +860,17 @@ function renderBatStats(){
 
 function renderLineScore(){
   let html="<thead><tr><th class='nm' style='text-align:left'>Team</th>";
-  for(let i=1;i<=INNINGS;i++)html+=`<th>${i}</th>`;
-  html+="<th>R</th><th>H</th></tr></thead><tbody>";
+  for(let i=1;i<=INNINGS;i++)html+=`<th class="inn">${i}</th>`;
+  html+="<th class='stat-sep'>R</th><th>H</th><th>E</th></tr></thead><tbody>";
   ["away","home"].forEach(side=>{
-    let H=0;
+    let H=0,E=0;
     html+=`<tr><td class="nm">${esc(teamLabel(side))}</td>`;
-    for(let i=1;i<=INNINGS;i++){const h=inningHits(side,i);H+=h;html+=`<td>${inningRuns(side,i)}</td>`;}
-    html+=`<td><b>${teamRuns(G,side)}</b></td><td>${H}</td></tr>`;
+    for(let i=1;i<=INNINGS;i++){
+      const h=inningHits(side,i);H+=h;
+      E+=inningErrors(side,i);
+      html+=`<td class="inn">${inningRuns(side,i)}</td>`;
+    }
+    html+=`<td class="stat-sep"><b>${teamRuns(G,side)}</b></td><td>${H}</td><td>${E}</td></tr>`;
   });
   html+="</tbody>";
   $("#lineScore").innerHTML=html;

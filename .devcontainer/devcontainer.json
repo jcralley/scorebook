@@ -11,7 +11,8 @@
     "vscode": {
       "extensions": ["ms-python.python", "ms-python.pylint"],
       "settings": {
-        "terminal.integrated.defaultProfile.linux": "zsh"
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "terminal.integrated.fontFamily": "'MesloLGS NF', 'Cascadia Code', monospace"
       }
     }
   },
