@@ -31,4 +31,16 @@ bar=""
 for ((i=0; i<filled; i++)); do bar="${bar}█"; done
 for ((i=0; i<empty; i++)); do bar="${bar} "; done
 
-printf "${color}[${bar}] %d%%${reset}" "$used_int"
+# Extract model and effort
+model=$(echo "$input" | jq -r '.model.display_name // empty')
+effort=$(echo "$input" | jq -r '.effort.level // empty')
+
+# Shorten model name by stripping "Claude " prefix
+model_short="${model#Claude }"
+
+# Build suffix
+suffix=""
+[ -n "$model_short" ] && suffix="${suffix} | ${model_short}"
+[ -n "$effort" ] && suffix="${suffix} | ${effort}"
+
+printf "${color}[${bar}] %d%%${reset}%s" "$used_int" "$suffix"
