@@ -28,7 +28,7 @@ reset="\033[0m"
 
 # Build the bar string
 bar=""
-[ "$filled" -gt 0 ] && bar=$(printf "%${filled}s" | tr ' ' '█')
-[ "$empty"  -gt 0 ] && bar="${bar}$(printf "%${empty}s")"
+for ((i=0; i<filled; i++)); do bar="${bar}█"; done
+for ((i=0; i<empty; i++)); do bar="${bar} "; done
 
 printf "${color}[${bar}] %d%%${reset}" "$used_int"
