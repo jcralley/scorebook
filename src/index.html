@@ -896,7 +896,7 @@ function renderInningStats(){
 function renderLineScore(){
   let html="<thead><tr><th class='nm' style='text-align:left'>Team</th>";
   for(let i=1;i<=INNINGS;i++)html+=`<th class="inn">${i}</th>`;
-  html+="<th class='stat-sep'>R</th><th>H</th><th>E</th></tr></thead><tbody>";
+  html+="<th class='stat-sep'>R</th><th class='inn'>H</th><th class='inn'>E</th></tr></thead><tbody>";
   ["away","home"].forEach(side=>{
     let H=0,E=0;
     html+=`<tr><td class="nm">${esc(teamLabel(side))}</td>`;
@@ -905,7 +905,7 @@ function renderLineScore(){
       E+=inningErrors(side,i);
       html+=`<td class="inn">${inningRuns(side,i)}</td>`;
     }
-    html+=`<td class="stat-sep"><b>${teamRuns(G,side)}</b></td><td>${H}</td><td>${E}</td></tr>`;
+    html+=`<td class="stat-sep"><b>${teamRuns(G,side)}</b></td><td class='inn'>${H}</td><td class='inn'>${E}</td></tr>`;
   });
   html+="</tbody>";
   $("#lineScore").innerHTML=html;
